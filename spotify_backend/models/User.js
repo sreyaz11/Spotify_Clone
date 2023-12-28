@@ -11,11 +11,16 @@ const User = new mongoose.Schema({
     },
     email : {
         type: String,
-        required: true
+        required: true  
     },
     userName : {
         type: String,
         required: true
+    },
+    password: {
+        type: String,
+        required: true,
+        private: true,
     },
     likedSongs : {
         //to be converted into array later

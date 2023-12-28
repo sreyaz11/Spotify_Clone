@@ -5,42 +5,43 @@ const bcryptjs = require("bcryptjs");
 const {getToken} = require("../utils/helpers");
 
 router.post("/register", async (req, res) => {
-    const{email, password, firstName, lastName, userName} = req.body;
-
+    const {email, password, firstName, lastName, userName} = req.body;
     const user = await User.findOne({email: email});
-    if(user){
+    if (user) {
         return res
-                .status(403)
-                .json({error: "A user with thsi email address already exists"});
+            .status(403)
+            .json({error: "A user with this email already exists"});
     }
-    const hashedPassword = bcryptjs.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
     const newUserData = {email, password: hashedPassword, firstName, lastName, userName};
     const newUser = await User.create(newUserData);
+    console.log(newUserData);
 
     const token = await getToken(email, newUser);
 
     const userToReturn = {...newUser.toJSON(), token};
+    console.log(userToReturn);
     delete userToReturn.password;
     return res.status(200).json(userToReturn);
 });
 
 router.post("/login", async (req, res) => {
     const {email, password} = req.body;
-    const user = await User.findOne({emial: email});
 
-    if(!user){
-        return res.status(403).json({err: "Invalid Credentials"});
+    const user = await User.findOne({email: email});
+    if (!user) {
+        return res.status(403).json({err: "Invalid credentials"});
     }
 
-    const isPassowrdValid = await bcryptjs.compare(password, user.password);
-
-    if(!isPassowrdValid){
-        return res.status(403).json({err: "Invalid Credentials"});
+    console.log(user);
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+        return res.status(403).json({err: "Invalid credentials"});
     }
     const token = await getToken(user.email, user);
     const userToReturn = {...user.toJSON(), token};
     delete userToReturn.password;
-    res.status(200).json(userToReturn);
+    return res.status(200).json(userToReturn);
 });
 
 module.exports = router;
