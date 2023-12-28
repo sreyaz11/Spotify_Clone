@@ -5,7 +5,7 @@ import LoginComponent from "./routes/Login.js";
 
 function App() {
   return (
-    <div className="App">
+    <div className="w-screen h-screen">
       <BrowserRouter>
           <Routes>
               <Route path="/login" element ={<LoginComponent/>}/>
